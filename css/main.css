@@ -1,7 +1,10 @@
 html, body {
   min-height: 100vh;
 }
-
+.test{
+  opacity:0.5;
+  text-decoration: line-through;
+}
 body {
   background-color: #E4E5E7;
   padding-top: 30px;
