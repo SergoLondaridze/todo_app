@@ -11,7 +11,9 @@ form.addEventListener('submit', addTask);
 tasksList.addEventListener('click', deleteTask);
 tasksList.addEventListener('click', doneTask);
 
+let tasks = [];
 
+checkEmptyList();
 
 function addTask(event) {
 
@@ -19,9 +21,19 @@ function addTask(event) {
 
     const taskText = taskInput.value;
 
+    const newTask = {
+        id: Date.now(),
+        text: taskText,
+        done: false
+    };
+
+    tasks.push(newTask);
+
+    const cssClass = newTask.done ? 'task-title task-title--done' : 'task-title';
+
     const taskHTML = `
-        <li class="list-group-item d-flex justify-content-between task-item">
-            <span class="task-title">${taskText}</span>
+        <li id="${newTask.id}" class="list-group-item d-flex justify-content-between task-item">
+            <span class="${cssClass}">${newTask.text}</span>
             <div class="task-item__buttons">
                 <button type="button" data-action="done" class="btn-action">
                     <img src="./img/tick.svg" alt="Done" width="18" height="18">
@@ -34,9 +46,7 @@ function addTask(event) {
 
     tasksList.insertAdjacentHTML('beforeend', taskHTML);
 
-    if (tasksList.children.length > 1) {
-        emptyList.classList.add('none');
-    }
+    checkEmptyList();
 
     taskInput.value = "";
     taskInput.focus();
@@ -46,22 +56,55 @@ function addTask(event) {
 function deleteTask(event) {
 
     if (event.target.dataset.action === 'delete') {
-        event.target.closest('li').remove();
 
-        if (tasksList.children.length === 1) {
-            emptyList.classList.remove('none');
-        }
+        const parentNode = event.target.closest('li');
+
+        const id = Number(parentNode.id);
+
+        const index = tasks.findIndex(task => task.id === id);
+
+        tasks.splice(index, 1);
+
+        parentNode.remove();
+
+        checkEmptyList();
     }
 
 }
 function doneTask(event) {
 
     if (event.target.dataset.action === 'done') {
+
         const parentNode = event.target.closest('li');
+
+        const id = Number(parentNode.id);
+
+        const task = tasks.find((task) => task.id === id);
+        task.done = !task.done;
+
         const taskTitle = parentNode.querySelector('.task-title');
+
         taskTitle.classList.toggle('task-title--done');
 
     }
 
 
+}
+
+function checkEmptyList() {
+    if (tasks.length === 0) {
+        const emptyListHTML = `
+         <li id="emptyList" class="list-group-item empty-list">
+             <img src="./img/leaf.svg" alt="Empty" width="48" class="mt-3">
+             <div class="empty-list__title">To-Do list is empty</div>
+          </li>
+        `;
+        tasksList.insertAdjacentHTML('afterbegin', emptyListHTML);
+    } else {
+        const emptyListEl=document.querySelector('#emptyList');
+
+        if(emptyListEl){
+            emptyListEl.remove();
+        }
+    }
 }
