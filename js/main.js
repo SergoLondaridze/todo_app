@@ -4,19 +4,21 @@ const form = document.querySelector('#form');
 const taskInput = document.querySelector('#taskInput');
 const tasksList = document.querySelector('#tasksList');
 const emptyList = document.querySelector('#emptyList');
+const removeDoneTasks= document.querySelector('#removeDoneTasks');
 
 
 
 form.addEventListener('submit', addTask);
 tasksList.addEventListener('click', deleteTask);
 tasksList.addEventListener('click', doneTask);
+removeDoneTasks.addEventListener('click',removeDone);
 
 let tasks = [];
 
 if (localStorage.getItem('tasks')) {
 
     tasks = JSON.parse(localStorage.getItem('tasks'));
-    
+
     tasks.forEach(task => {
         renderTask(task);
     });
@@ -135,4 +137,26 @@ function renderTask(task) {
         </li>`;
 
     tasksList.insertAdjacentHTML('beforeend', taskHTML);
+}
+
+function removeDone(){
+
+    let tempArr=[...tasks];
+
+    tempArr.forEach(task=>{
+
+       if(task.done){
+        // console.log(document.getElementById(`${task.id}`));
+        document.getElementById(`${task.id}`).remove();
+
+        const id = Number(task.id);
+        const index = tasks.findIndex(task => task.id === id);
+        tasks.splice(index, 1);
+
+       }
+      
+    })
+
+    saveToLocalStorage();
+    checkEmptyList();
 }
